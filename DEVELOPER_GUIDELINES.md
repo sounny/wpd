@@ -2,7 +2,7 @@
 
 Please note the following before you begin:
 - By contributing to WebPlotDigitizer, you are automatically agreeing to the [Contributor License Agreement](CONTRIBUTING.md).
-- Opensource doesn't automatically imply that this project is open for all kinds of contributions. Please consult with Ankit Rohatgi before considering to make any large contributions.
+- Open source doesn't automatically imply that this project is open for all kinds of contributions. Please consult with Ankit Rohatgi before considering to make any large contributions.
 
 ## Where to start?
 
@@ -73,7 +73,7 @@ To run the electron app, follow these steps:
     npm install
     npm start
 
-At the moment, this is only an basic implementation. If you are familiar with electron app development, then feel free to contribute here.
+    At the moment, this is only a basic implementation. If you are familiar with electron app development, feel free to contribute here.
 
 On a Linux development machine, you will also need `wine` to build the Windows app. To build the apps, run:
 
@@ -150,4 +150,4 @@ Use [Poedit](https://poedit.net/) to edit the `.po` files in `app/locale` folder
 
 ## Documentation, Tutorial Videos
 
-Good documentation and tutorials are severly lacking and any help would be highly appreciated. The LaTeX source for the current user manual is in the `docs/latex` folder.
+Good documentation and tutorials are severely lacking and any help would be highly appreciated. The LaTeX source for the current user manual is in the `docs/latex` folder.

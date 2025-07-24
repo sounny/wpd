@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sounny's WebPlotDigitizer</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="widgets.css">
+  <link rel="shortcut icon" href="favicon.ico">
+  
+  <!-- Add missing third-party dependencies -->
+  <script>
+    // Simple fallback for missing dependencies
+    window.pdfjsLib = window.pdfjsLib || {
+      getDocument: function() { 
+        return { promise: Promise.reject(new Error('PDF.js not available')) }; 
+      }
+    };
+    
+    // Simple tarball fallback
+    window.tarball = window.tarball || {
+      extract: function() { 
+        return Promise.reject(new Error('Tarball.js not available')); 
+      }
+    };
+  </script>
+</head>
+<body>
+  <div id="loadingCurtain" style="position:absolute;top:0;left:0;width:100%;height:100%;background-color:white;z-index:100;display:flex;justify-content:center;align-items:center;">
+    Loading application, please wait...
+  </div>
+
+  <div id="allContainer">
+    <!-- toolbar + graphics -->
+    <div id="mainContainer">
+      <div id="topContainer">
+        <div id="menuButtonsContainer"></div>
+        <div id="topToolbarContainer">
+          <div style="position:relative;"></div>
+        </div>
+        <div style="display: inline-flex; justify-content: space-between; width: 200px; position: absolute; top: 9px; right: 290px;">
+          <button type="button" title="Rotate 90° counter-clockwise" onclick="wpd.graphicsWidget.rotateCounterClockwise();" style="border:none; width:20px; font-size:16px; display:inline-flex; align-items:self-end; justify-content:center;">↺</button>
+          <button type="button" title="Rotate 90° clockwise" onclick="wpd.graphicsWidget.rotateClockwise();" style="border:none; width:20px; font-size:16px; display:inline-flex; align-items:self-end; justify-content:center;">↻</button>
+          <button type="button" title="Zoom in" onclick="wpd.graphicsWidget.zoomIn();" style="border:none; width:20px;">+</button>
+          <button type="button" title="Zoom out" onclick="wpd.graphicsWidget.zoomOut();" style="border:none; width:20px;">-</button>
+          <button type="button" title="View actual size" onclick="wpd.graphicsWidget.zoom100perc();" style="border:none;">100%</button>
+          <button type="button" title="Fit to graphics area" onclick="wpd.graphicsWidget.zoomFit();" style="border:none;">Fit</button>
+          <button title="Toggle extended crosshair" onclick="wpd.graphicsWidget.toggleExtendedCrosshairBtn();" style="border:none; width:20px; background-image: url('images/crosshair.png'); background-repeat: no-repeat; background-position: center;" id="extended-crosshair-btn">&nbsp;</button>
+        </div>
+      </div>
+
+      <div style="display: flex;">
+        <div id="left-side-container" style="width:200px; flex: 0 0 169px;">
+          <!-- tree control -->
+        </div>
+
+        <div id="graphicsContainer" style="flex: 1;">
+          <!-- the main canvas goes here -->
+          <div id="canvasDiv" style="position:relative;">
+            <canvas id="mainCanvas" class="canvasLayers" style="z-index:1;"></canvas>
+            <canvas id="dataCanvas" class="canvasLayers" style="z-index:2;"></canvas>
+            <canvas id="drawCanvas" class="canvasLayers" style="z-index:3;"></canvas>
+            <canvas id="hoverCanvas" class="canvasLayers" style="z-index:4;"></canvas>
+            <canvas id="topCanvas" class="canvasLayers" style="z-index:5;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div id="bottomContainer">
+        <div id="bottomNavbarContainer"></div>
+      </div>
+    </div>
+
+    <!-- sidebar + zoom -->
+    <div id="sidebarContainer">
+      <!-- zoom window goes here -->
+      <div style="position:relative;" id="zoomDiv">
+        <canvas id="zoomCanvas" class="zoomLayers" width=250 height=250 style="position:relative; top: 0px; left: 0px; z-index:1;"></canvas>
+        <canvas id="zoomCrossHair" class="zoomLayers" width=250 height=250 style="position:absolute; top: 0px; left: 0px; z-index:2; background:transparent;"></canvas>
+        <div id="cursorPosition" style="position:relative;">
+          [<span id="mousePosition"></span>]
+        </div>
+      </div>
+
+      <div id="zoom-settings-container"><input type="button" id="zoom-settings-button" title="Change zoom settings" value="&#9881;" onclick="wpd.zoomView.showSettingsWindow();" /></div>
+
+      <div style="position:relative;" id="sidebarControlsContainer">
+        <!-- side bars go here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Basic translation strings -->
+  <div style="display:none;" id="translation-strings">
+    <span id="i18n-string-invalid-project">Invalid project</span>
+    <span id="i18n-string-loading">Loading application, please wait...</span>
+    <span id="i18n-string-fit">Fit</span>
+  </div>
+
+  <!-- Individual, uncompressed javascript files -->
+  <script src="javascript/controllers/appData.js"></script>
+  <script src="javascript/controllers/autoDetection.js"></script>
+  <script src="javascript/controllers/axesCalibration.js"></script>
+  <script src="javascript/controllers/browserInfo.js"></script>
+  <script src="javascript/controllers/colorPicker.js"></script>
+  <script src="javascript/controllers/datasetManagement.js"></script>
+  <script src="javascript/controllers/fileManager.js"></script>
+  <script src="javascript/controllers/gridDetection.js"></script>
+  <script src="javascript/controllers/i18n.js"></script>
+  <script src="javascript/controllers/imageEditing.js"></script>
+  <script src="javascript/controllers/imageManager.js"></script>
+  <script src="javascript/controllers/manualDetection.js"></script>
+  <script src="javascript/controllers/measurements.js"></script>
+  <script src="javascript/controllers/pageManager.js"></script>
+  <script src="javascript/controllers/undoManager.js"></script>
+  <script src="javascript/controllers/utils.js"></script>
+  <script src="javascript/core/autoDetection.js"></script>
+  <script src="javascript/core/axes/bar.js"></script>
+  <script src="javascript/core/axes/circularChartRecorder.js"></script>
+  <script src="javascript/core/axes/image.js"></script>
+  <script src="javascript/core/axes/map.js"></script>
+  <script src="javascript/core/axes/polar.js"></script>
+  <script src="javascript/core/axes/ternary.js"></script>
+  <script src="javascript/core/axes/xy.js"></script>
+  <script src="javascript/core/calibration.js"></script>
+  <script src="javascript/core/color.js"></script>
+  <script src="javascript/core/colorAnalysis.js"></script>
+  <script src="javascript/core/connectedPoints.js"></script>
+  <script src="javascript/core/curve_detection/averagingWindow.js"></script>
+  <script src="javascript/core/curve_detection/averagingWindowCore.js"></script>
+  <script src="javascript/core/curve_detection/averagingWindowWithStepSize.js"></script>
+  <script src="javascript/core/curve_detection/barExtraction.js"></script>
+  <script src="javascript/core/curve_detection/blobdetector.js"></script>
+  <script src="javascript/core/curve_detection/customIndependents.js"></script>
+  <script src="javascript/core/curve_detection/xStepWithInterpolation.js"></script>
+  <script src="javascript/core/dataProviders.js"></script>
+  <script src="javascript/core/dataset.js"></script>
+  <script src="javascript/core/dateConversion.js"></script>
+  <script src="javascript/core/gridDetectionCore.js"></script>
+  <script src="javascript/core/inputParser.js"></script>
+  <script src="javascript/core/mathFunctions.js"></script>
+  <script src="javascript/core/plotData.js"></script>
+  <script src="javascript/core/point_detection/template_matching_detector.js"></script>
+  <script src="javascript/core/rle.js"></script>
+  <script src="javascript/services/args.js"></script>
+  <script src="javascript/services/dataExport.js"></script>
+  <script src="javascript/services/download.js"></script>
+  <script src="javascript/services/events.js"></script>
+  <script src="javascript/services/log.js"></script>
+  <script src="javascript/services/plotly.js"></script>
+  <script src="javascript/services/saveResume.js"></script>
+  <script src="javascript/services/scriptInjection.js"></script>
+  <script src="javascript/tools/axesCalibrationTools.js"></script>
+  <script src="javascript/tools/colorPickerTools.js"></script>
+  <script src="javascript/tools/graphicsHelper.js"></script>
+  <script src="javascript/tools/gridDetectionTools.js"></script>
+  <script src="javascript/tools/imageEditingTools.js"></script>
+  <script src="javascript/tools/imageOps.js"></script>
+  <script src="javascript/tools/keyCodes.js"></script>
+  <script src="javascript/tools/manualDetectionTools.js"></script>
+  <script src="javascript/tools/maskTools.js"></script>
+  <script src="javascript/tools/measurementTools.js"></script>
+  <script src="javascript/widgets/dataTable.js"></script>
+  <script src="javascript/widgets/graphicsWidget.js"></script>
+  <script src="javascript/widgets/layoutManager.js"></script>
+  <script src="javascript/widgets/pointGroups.js"></script>
+  <script src="javascript/widgets/popups.js"></script>
+  <script src="javascript/widgets/sidebars.js"></script>
+  <script src="javascript/widgets/toolbars.js"></script>
+  <script src="javascript/widgets/tree.js"></script>
+  <script src="javascript/widgets/webcam.js"></script>
+  <script src="javascript/widgets/zoom.js"></script>
+
+  <!-- Core application script -->
+  <script src="javascript/main.js"></script>
+  <script>
+    console.log("Starting app initialization...");
+    
+    // Add error handling
+    window.addEventListener('error', function(e) {
+      console.error('Script error:', e.filename, e.lineno, e.message);
+    });
+    
+    // Custom simplified initialization
+    function initSimplified() {
+      console.log("Simplified initialization...");
+      
+      // Check if required objects exist
+      if (typeof wpd === 'undefined') {
+        console.error("wpd object not found!");
+        document.getElementById('loadingCurtain').innerHTML = "Error: Core wpd object missing. Check console.";
+        return;
+      }
+      
+      // Initialize basic components that exist
+      try {
+        if (wpd.browserInfo && wpd.browserInfo.checkBrowser) {
+          wpd.browserInfo.checkBrowser();
+        }
+        
+        if (wpd.layoutManager && wpd.layoutManager.initialLayout) {
+          wpd.layoutManager.initialLayout();
+        }
+        
+        // Try to load default image
+        if (wpd.loadDefaultImage) {
+          wpd.loadDefaultImage();
+        }
+        
+        // Hide loading screen
+        document.getElementById('loadingCurtain').style.display = 'none';
+        console.log("Application loaded successfully!");
+        
+      } catch (error) {
+        console.error("Initialization error:", error);
+        document.getElementById('loadingCurtain').innerHTML = "Error: " + error.message;
+      }
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("DOM loaded, checking wpd object:", typeof wpd);
+      setTimeout(initSimplified, 100); // Small delay to ensure all scripts are loaded
+    }, true);
+  </script>
+</body>
+</html>
