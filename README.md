@@ -1,44 +1,66 @@
-Sounny's WebPlotDigitizer (Fork)
-=================================
+Sounny's WebPlotDigitizer (Static Vanilla JS Fork)
+==================================================
 
-This is Sounny's fork of WebPlotDigitizer, a web-based tool to extract numerical data from plot images. Supports XY, Polar, Ternary diagrams, and Maps. This open source tool is used by thousands and [cited in over 600 published articles](https://scholar.google.com/scholar?as_vis=1&q=WebPlotDigitizer&hl=en&as_sdt=0,44). Visit https://automeris.io/WebPlotDigitizer for the original project.
-Quick start
+This is Sounny's fork of WebPlotDigitizer, a web-based tool to extract numerical data from plot images. It supports XY, Polar, Ternary, and Map axes. WebPlotDigitizer is used by thousands and is [cited in 600+ publications](https://scholar.google.com/scholar?as_vis=1&q=WebPlotDigitizer&hl=en&as_sdt=0,44). For the original project, visit https://automeris.io/WebPlotDigitizer.
+
+![WebPlotDigitizer Screenshot](screenshot.png?raw=true "WebPlotDigitizer")
+
+## Live demo
+
+- GitHub Pages (if enabled): https://sounny.github.io/wpd/
+	- If the link returns 404, enable GitHub Pages in the repository settings (Pages → Deploy from branch → `master` → `/ (root)`).
+
+## Quick start
+
 1. Open `index.html` in a modern browser (Chrome, Edge, Safari, Firefox), or serve the folder with any static HTTP server.
 2. Click “Load sample” to try it instantly, or use “Load image/PDF” to select your own file.
 3. Use the left tree to switch between Image, Axes, Datasets, and Measurements. The right-hand zoom pane helps with precise clicks.
 
-Notes
-- PDF import works via PDF.js (loaded from a CDN). Multi-page PDFs enable a Page selector in the top bar.
-- Project resume from .tar archives is disabled in this static build.
+Tip: Some browsers restrict web workers over the `file://` scheme. If PDF import fails when opening `index.html` directly, serve via HTTP (for example, with Python's simple server) and retry.
 
-UI tweaks in this fork
-- A modernized top bar with Load sample and Help.
-- Minimal popups and page relabel controls are built-in (no templating).
+## Features in this fork
 
-Maintenance notes
-- The historical `app/` folder (templates/build scripts) is not used in this fork. All runtime files live at the repository root for static hosting.
-![WebPlotDigitizer Screenshot](screenshot.png?raw=true "WebPlotDigitizer")
+- Static, framework-free build that runs from a single `index.html` (GitHub Pages friendly).
+- PDF import via PDF.js (loaded from a CDN). Multi-page PDFs enable a Page selector in the top bar.
+- Non-blocking Help and Start sidebars with quick instructions.
+- “Load sample” for instant testing and “Export CSV” for easy data export.
+- Light theme by default with modernized styles.
 
+## Notes
 
-Sample image
-- A small sample image (`start.png`) is included; “Load sample” uses this so you can test immediately.
-Contact & Resources
--------------------
+- Project resume from `.tar` archives is disabled in this static build (no bundler or Node services).
+- You may see a benign `GET /log` 404 in the browser console; it's from an analytics stub and can be ignored on static hosting.
 
-To report issues, use GitHub Issues on this repository. For general inquiries or contributions, visit https://sounny.github.io or contact the maintainer via GitHub.
+## Project structure
 
-License
--------
+- `index.html` — Main entry point; includes all scripts and UI.
+- `styles.css`, `widgets.css` — Core styles.
+- `javascript/` — Application logic (controllers, services, widgets, tools).
+- `images/` — Built-in icons and sample assets.
+- `start.png` — Small sample image used by “Load sample”.
+- `screenshot.png` — Screenshot for this README.
+- `app/` — Historical folder for templates/build scripts; not used in this fork.
 
-WebPlotDigitizer is distributed under [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html). Sounny's fork is also distributed under the same license.
+## Troubleshooting
 
-Stable Versions & Running
--------------------------
+- PDF import fails or worker error in console: serve the folder via HTTP instead of opening with `file://` and try again.
+- UI doesn’t update after a change: hard refresh (Cmd+Shift+R) to bypass cache.
+- 404 for `/log`: expected on static hosting; safe to ignore.
 
-The master branch in this repository is for development of Sounny's fork and may be unstable. To access stable releases of the original WebPlotDigitizer, visit: https://github.com/ankitrohatgi/WebPlotDigitizer/releases
+## Stable versions of the original
 
-This version runs on vanilla JavaScript and can be opened in any modern web browser by loading `index.html`.
-Contributing & Agents Memory
----------------------------
+The `master` branch here tracks active development of this static fork. For stable releases of the original WebPlotDigitizer, see: https://github.com/ankitrohatgi/WebPlotDigitizer/releases
 
-To contribute to Sounny's fork, please refer to the [developer guidelines](DEVELOPER_GUIDELINES.md). All agents (human or automated) should log changes, ideas, and decisions in the [Agents Memory](agents.md) to provide context for future contributors.
+## Contributing & agents memory
+
+- Read the [Developer Guidelines](DEVELOPER_GUIDELINES.md).
+- Log significant changes, ideas, and decisions in [agents.md](agents.md) to maintain context for future contributors.
+
+## License
+
+WebPlotDigitizer is distributed under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html). This fork is also distributed under the same license.
+
+## Contact & resources
+
+- Issues: use GitHub Issues on this repository.
+- Info and updates: https://sounny.github.io
