@@ -39,11 +39,13 @@
             <input class="btn" type="file" id="fileLoadBox" accept="image/*,application/pdf" onchange="wpd.imageManager.load()" />
             <select id="sample-select" class="btn" title="Choose a sample image">
               <option value="start.png">Sample: Getting Started</option>
-              <option value="images/xyaxes.png">Sample: XY Axes</option>
-              <option value="images/polaraxes.png">Sample: Polar Axes</option>
-              <option value="images/ternaryaxes.png">Sample: Ternary Axes</option>
-              <option value="images/map.png">Sample: Map</option>
-              <option value="images/barchart.png">Sample: Bar Chart</option>
+              <option value="images/xyaxes.svg">Sample: XY Axes</option>
+              <option value="images/polaraxes.svg">Sample: Polar Axes</option>
+              <option value="images/ternaryaxes.svg">Sample: Ternary Axes</option>
+              <option value="images/map.svg">Sample: Map</option>
+              <option value="images/circular_chart_recorder_axes.svg">Sample: Circular Chart Recorder</option>
+              <option value="images/ternarynormal.svg">Sample: Ternary (Normal)</option>
+              <option value="images/ternaryreverse.svg">Sample: Ternary (Reverse)</option>
             </select>
             <button class="btn btn-primary" type="button" onclick="window._wpdLoadSample()">Load sample</button>
             <button class="btn" type="button" onclick="wpd.dataExport.generateCSV()">Export CSV</button>
@@ -112,6 +114,23 @@
 
       <div style="position:relative;" id="sidebarControlsContainer">
         <!-- Minimal sidebars -->
+        <div id="guide-sidebar" class="sidebar" style="display:none; padding:8px;">
+          <h3>Guided workflow</h3>
+          <ol>
+            <li style="margin-bottom:8px;">
+              <button class="btn btn-primary" type="button" onclick="wpd.alignAxes.addCalibration()">1) Calibrate axes</button>
+              <div style="font-size:12px;color:#666;">Pick XY if unsure. Draw corners, then enter axis values to align.</div>
+            </li>
+            <li style="margin-bottom:8px;">
+              <button class="btn" type="button" onclick="wpd.acquireData && wpd.acquireData.load()">2) Start digitizing</button>
+              <div style="font-size:12px;color:#666;">Click points on the plot. Use zoom at right for precision.</div>
+            </li>
+            <li>
+              <button class="btn" type="button" onclick="wpd.dataExport && wpd.dataExport.generateCSV()">3) Export CSV</button>
+              <div style="font-size:12px;color:#666;">Download all datasets as a CSV file.</div>
+            </li>
+          </ol>
+        </div>
         <div id="start-sidebar" class="sidebar" style="display:none; padding:8px;">
           <h3>Start</h3>
           <p>Use the file input above to load an image or PDF, or pick a sample from the dropdown.</p>
@@ -125,6 +144,17 @@
         <div id="image-editing-sidebar" class="sidebar" style="display:none; padding:8px;">
           <h3>Image</h3>
           <p>Rotate or zoom using the controls above. Additional tools will appear as needed.</p>
+        </div>
+        <div id="acquireDataSidebar" class="sidebar" style="display:none; padding:8px;">
+          <h3>Digitize</h3>
+          <p>Click to add points. Shortcuts: A adjust, S select, D delete.</p>
+          <p>Points: <strong class="data-point-counter">0</strong></p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn" type="button" onclick="wpd.acquireData && wpd.acquireData.manualSelection()">Add points</button>
+            <button class="btn" type="button" onclick="wpd.acquireData && wpd.acquireData.adjustPoints()">Adjust</button>
+            <button class="btn" type="button" onclick="wpd.acquireData && wpd.acquireData.deletePoint()">Delete</button>
+            <button class="btn" type="button" onclick="wpd.acquireData && wpd.acquireData.clearAll()">Clear all</button>
+          </div>
         </div>
         <div id="help-sidebar" class="sidebar" style="display:none; padding:8px;">
           <h3>Help</h3>
@@ -185,6 +215,65 @@
       <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end;">
         <input id="ok-cancel-popup-ok-button" type="button" value="OK" onclick="wpd.okCancelPopup.ok()">
         <input id="ok-cancel-popup-cancel-button" type="button" value="Cancel" onclick="wpd.okCancelPopup.cancel()">
+      </div>
+    </div>
+  </div>
+  <!-- Axes selection and XY calibration popups (minimal) -->
+  <div id="axesList" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span>Select axes type</span>
+      <input type="button" value="×" title="Close" onclick="wpd.popup.close('axesList')" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+        <label><input type="radio" name="axesType" id="r_xy" checked> XY</label>
+        <label><input type="radio" name="axesType" id="r_bar"> Bar</label>
+        <label><input type="radio" name="axesType" id="r_polar"> Polar</label>
+        <label><input type="radio" name="axesType" id="r_ternary"> Ternary</label>
+        <label><input type="radio" name="axesType" id="r_map"> Map</label>
+        <label><input type="radio" name="axesType" id="r_image"> Image</label>
+        <label><input type="radio" name="axesType" id="r_circular_chart_recorder"> Circular Chart Recorder</label>
+      </div>
+      <div style="text-align:right; margin-top:10px; display:flex; gap:8px; justify-content:flex-end;">
+        <input type="button" value="Cancel" onclick="wpd.popup.close('axesList')">
+        <input type="button" value="Start" onclick="wpd.alignAxes && wpd.alignAxes.start()">
+      </div>
+    </div>
+  </div>
+
+  <div id="xyAxesInfo" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span>XY Axes Calibration</span>
+      <input type="button" value="×" title="Close" onclick="wpd.popup.close('xyAxesInfo')" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <p>Click the four corners of the plot area in order: X1, X2, Y1, Y2.</p>
+      <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end;">
+        <input type="button" value="Pick corners" onclick="wpd.alignAxes && wpd.alignAxes.pickCorners()">
+        <input type="button" value="Continue to values" onclick="wpd.alignAxes && wpd.alignAxes.getCornerValues()">
+      </div>
+    </div>
+  </div>
+
+  <div id="xyAlignment" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span>Enter axis values</span>
+      <input type="button" value="×" title="Close" onclick="wpd.popup.close('xyAlignment')" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <div style="display:grid; grid-template-columns: auto 1fr auto 1fr; gap:6px; align-items:center;">
+        <label for="xmin">X min</label><input id="xmin" type="text" placeholder="e.g., 0">
+        <label for="xmax">X max</label><input id="xmax" type="text" placeholder="e.g., 10">
+        <label for="ymin">Y min</label><input id="ymin" type="text" placeholder="e.g., 0">
+        <label for="ymax">Y max</label><input id="ymax" type="text" placeholder="e.g., 10">
+      </div>
+      <div style="margin-top:8px; display:flex; gap:12px;">
+        <label><input id="xlog" type="checkbox"> Log X</label>
+        <label><input id="ylog" type="checkbox"> Log Y</label>
+        <label><input id="xy-axes-no-rotation" type="checkbox"> No rotation</label>
+      </div>
+      <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+        <input type="button" value="Align" onclick="wpd.alignAxes && wpd.alignAxes.align()">
       </div>
     </div>
   </div>

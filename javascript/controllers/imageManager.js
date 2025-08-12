@@ -108,10 +108,10 @@ wpd.imageManager = (function() {
             wpd.tree.refreshPreservingSelection();
         }
         if (_firstLoad) {
-            wpd.sidebar.show('start-sidebar');
+            wpd.sidebar.show('guide-sidebar');
         } else if (!resumedProject) {
             // Show guidance in sidebar instead of a blocking popup
-            try { wpd.sidebar.show('help-sidebar'); } catch (e) {}
+            try { wpd.sidebar.show('guide-sidebar'); } catch (e) {}
         }
         _firstLoad = false;
         _newLoad = false;
