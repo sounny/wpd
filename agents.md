@@ -4,6 +4,11 @@ This document serves as a memory for all agents (human or automated) working on 
 
 ## Change Log
 
+- Date: 2025-08-11
+  - **Automated Agent**: index.html — Added PDF.js via CDN and configured worker. Restored canonical init flow (wpd.initApp) and removed temporary simplified init. Added minimal DOM required by controllers/widgets: popups (shadow, message/ok-cancel), page navigation and relabel popup, basic sidebars, and essential i18n strings.
+  - **Automated Agent**: Smoke test — Served locally over HTTP; default image loads; a benign 404 to /log remains from analytics stub in services/log.js (safe to ignore on static hosting).
+  - **Automated Agent**: UI — Modernized top bar (brand, Load sample, Help), consistent button styles, refined popups; added Help modal with quick steps. README updated with Quick start and sample image notes.
+
 - Date: YYYY-MM-DD
   - **Agent**: Description of change
 

@@ -7,16 +7,15 @@
   <link rel="stylesheet" href="widgets.css">
   <link rel="shortcut icon" href="favicon.ico">
   
-  <!-- Add missing third-party dependencies -->
+  <!-- Third-party dependencies: PDF.js (for PDF import) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-+xZ9rC1NqAMlQ1S8h1C6qBf4krtCw4z69mZz0F0G9PjK+NQFduW6xYh2fYt2u+v7u8vWPGKqXh8aBkH8uy7pwg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
-    // Simple fallback for missing dependencies
-    window.pdfjsLib = window.pdfjsLib || {
-      getDocument: function() { 
-        return { promise: Promise.reject(new Error('PDF.js not available')) }; 
-      }
-    };
-    
-    // Simple tarball fallback
+    // Configure worker for PDF.js when available
+    if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    // Simple tarball fallback (project resume via .tar will be disabled gracefully)
     window.tarball = window.tarball || {
       extract: function() { 
         return Promise.reject(new Error('Tarball.js not available')); 
@@ -33,24 +32,52 @@
     <!-- toolbar + graphics -->
     <div id="mainContainer">
       <div id="topContainer">
-        <div id="menuButtonsContainer"></div>
+        <div id="menuButtonsContainer">
+          <div id="navbar">
+            <span class="brand">Sounny’s WPD</span>
+            <label for="fileLoadBox">Load image/PDF:</label>
+            <input class="btn" type="file" id="fileLoadBox" accept="image/*,application/pdf" onchange="wpd.imageManager.load()" />
+            <select id="sample-select" class="btn" title="Choose a sample image">
+              <option value="start.png">Sample: Getting Started</option>
+              <option value="images/xyaxes.png">Sample: XY Axes</option>
+              <option value="images/polaraxes.png">Sample: Polar Axes</option>
+              <option value="images/ternaryaxes.png">Sample: Ternary Axes</option>
+              <option value="images/map.png">Sample: Map</option>
+              <option value="images/barchart.png">Sample: Bar Chart</option>
+            </select>
+            <button class="btn btn-primary" type="button" onclick="window._wpdLoadSample()">Load sample</button>
+            <button class="btn" type="button" onclick="wpd.dataExport.generateCSV()">Export CSV</button>
+            <button class="btn btn-ghost" type="button" onclick="wpd.sidebar.show('help-sidebar')">Help</button>
+            <span id="navSeparator" style="margin:0 8px;">|</span>
+            <div class="files" style="display:none;">
+              <label for="image-file-select">File:</label>
+              <select id="image-file-select" onchange="wpd.appData.getFileManager().switch(this.value)"></select>
+            </div>
+            <div class="paged" style="display:none; align-items:center; gap:6px;">
+              <label for="image-page-nav-select">Page:</label>
+              <select id="image-page-nav-select" onchange="wpd.appData.getPageManager()?.switch(this.value)"></select>
+              <button type="button" title="Relabel pages" onclick="wpd.popup.show('image-page-relabel-popup')">Relabel…</button>
+            </div>
+          </div>
+        </div>
         <div id="topToolbarContainer">
           <div style="position:relative;"></div>
         </div>
-        <div style="display: inline-flex; justify-content: space-between; width: 200px; position: absolute; top: 9px; right: 290px;">
-          <button type="button" title="Rotate 90° counter-clockwise" onclick="wpd.graphicsWidget.rotateCounterClockwise();" style="border:none; width:20px; font-size:16px; display:inline-flex; align-items:self-end; justify-content:center;">↺</button>
-          <button type="button" title="Rotate 90° clockwise" onclick="wpd.graphicsWidget.rotateClockwise();" style="border:none; width:20px; font-size:16px; display:inline-flex; align-items:self-end; justify-content:center;">↻</button>
-          <button type="button" title="Zoom in" onclick="wpd.graphicsWidget.zoomIn();" style="border:none; width:20px;">+</button>
-          <button type="button" title="Zoom out" onclick="wpd.graphicsWidget.zoomOut();" style="border:none; width:20px;">-</button>
-          <button type="button" title="View actual size" onclick="wpd.graphicsWidget.zoom100perc();" style="border:none;">100%</button>
-          <button type="button" title="Fit to graphics area" onclick="wpd.graphicsWidget.zoomFit();" style="border:none;">Fit</button>
-          <button title="Toggle extended crosshair" onclick="wpd.graphicsWidget.toggleExtendedCrosshairBtn();" style="border:none; width:20px; background-image: url('images/crosshair.svg'); background-repeat: no-repeat; background-position: center;" id="extended-crosshair-btn">&nbsp;</button>
+        <div style="display: inline-flex; gap: 6px; position: absolute; top: 12px; right: 310px;">
+          <button class="btn" type="button" title="Rotate 90° counter-clockwise" onclick="wpd.graphicsWidget.rotateCounterClockwise();">↺</button>
+          <button class="btn" type="button" title="Rotate 90° clockwise" onclick="wpd.graphicsWidget.rotateClockwise();">↻</button>
+          <button class="btn" type="button" title="Zoom in" onclick="wpd.graphicsWidget.zoomIn();">+</button>
+          <button class="btn" type="button" title="Zoom out" onclick="wpd.graphicsWidget.zoomOut();">-</button>
+          <button class="btn" type="button" title="View actual size" onclick="wpd.graphicsWidget.zoom100perc();">100%</button>
+          <button class="btn" type="button" title="Fit to graphics area" onclick="wpd.graphicsWidget.zoomFit();">Fit</button>
+          <button class="btn" title="Toggle extended crosshair" onclick="wpd.graphicsWidget.toggleExtendedCrosshairBtn();" id="extended-crosshair-btn" style="width:32px; background-image: url('images/crosshair.svg'); background-repeat: no-repeat; background-position: center; background-size: 18px;">&nbsp;</button>
         </div>
       </div>
 
       <div style="display: flex;">
         <div id="left-side-container" style="width:200px; flex: 0 0 169px;">
           <!-- tree control -->
+          <div id="tree-container" class="tree-container" tabindex="0" aria-label="Project Tree"></div>
         </div>
 
         <div id="graphicsContainer" style="flex: 1;">
@@ -84,16 +111,121 @@
       <div id="zoom-settings-container"><input type="button" id="zoom-settings-button" title="Change zoom settings" value="&#9881;" onclick="wpd.zoomView.showSettingsWindow();" /></div>
 
       <div style="position:relative;" id="sidebarControlsContainer">
-        <!-- side bars go here -->
+        <!-- Minimal sidebars -->
+        <div id="start-sidebar" class="sidebar" style="display:none; padding:8px;">
+          <h3>Start</h3>
+          <p>Use the file input above to load an image or PDF, or pick a sample from the dropdown.</p>
+          <ol>
+            <li>Load an image/PDF.</li>
+            <li>Select Image, Axes, Datasets, or Measurements from the left tree.</li>
+            <li>Calibrate axes, then digitize data points.</li>
+            <li>Export data when done.</li>
+          </ol>
+        </div>
+        <div id="image-editing-sidebar" class="sidebar" style="display:none; padding:8px;">
+          <h3>Image</h3>
+          <p>Rotate or zoom using the controls above. Additional tools will appear as needed.</p>
+        </div>
+        <div id="help-sidebar" class="sidebar" style="display:none; padding:8px;">
+          <h3>Help</h3>
+          <ol>
+            <li>Load an image or PDF (or choose a sample) from the top bar.</li>
+            <li>Use the left tree to switch between Image, Axes, Datasets, and Measurements.</li>
+            <li>Calibrate axes first, then select a dataset and a detection method.</li>
+            <li>The zoom pane on the right helps with precise clicks.</li>
+            <li>For multi-page PDFs, use the Page selector in the top bar.</li>
+          </ol>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Basic translation strings -->
   <div style="display:none;" id="translation-strings">
+    <span id="i18n-string-image">Image</span>
+    <span id="i18n-string-axes">Axes</span>
+    <span id="i18n-string-datasets">Datasets</span>
+    <span id="i18n-string-measurements">Measurements</span>
+    <span id="i18n-string-distance">Distance</span>
+    <span id="i18n-string-angle">Angle</span>
+    <span id="i18n-string-area">Area</span>
     <span id="i18n-string-invalid-project">Invalid project</span>
     <span id="i18n-string-loading">Loading application, please wait...</span>
     <span id="i18n-string-fit">Fit</span>
+    <span id="i18n-string-processing">Processing</span>
+    <span id="i18n-string-ok">OK</span>
+    <span id="i18n-string-cancel">Cancel</span>
+    <span id="i18n-string-unsupported">Unsupported</span>
+    <span id="i18n-string-unsupported-text">This feature is not supported in this build.</span>
+    <span id="i18n-string-invalid-file">Invalid file</span>
+    <span id="i18n-string-invalid-file-text">Please select an image or a PDF file.</span>
+  </div>
+
+  <!-- Popups and modal infrastructure -->
+  <div id="shadow" style="visibility:hidden;"></div>
+  <div id="messagePopup" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span id="message-popup-heading">Message</span>
+      <input type="button" value="×" title="Close" onclick="wpd.messagePopup.close()" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <p id="message-popup-text"></p>
+      <div style="text-align:right;">
+        <input type="button" value="Close" onclick="wpd.messagePopup.close()">
+      </div>
+    </div>
+  </div>
+  <div id="okCancelPopup" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span id="ok-cancel-popup-heading">Confirm</span>
+      <input type="button" value="×" title="Close" onclick="wpd.okCancelPopup.cancel()" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <p id="ok-cancel-popup-text"></p>
+      <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end;">
+        <input id="ok-cancel-popup-ok-button" type="button" value="OK" onclick="wpd.okCancelPopup.ok()">
+        <input id="ok-cancel-popup-cancel-button" type="button" value="Cancel" onclick="wpd.okCancelPopup.cancel()">
+      </div>
+    </div>
+  </div>
+  <!-- Minimal stub for legacy popups referenced in controllers -->
+  <div id="loadNewImage" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span>Load Image</span>
+      <input type="button" value="×" title="Close" onclick="wpd.popup.close('loadNewImage')" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <p>Use the file input in the top bar to select an image or PDF.</p>
+    </div>
+  </div>
+  <div id="axesList" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span>Axes</span>
+      <input type="button" value="×" title="Close" onclick="wpd.popup.close('axesList')" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <p>After loading, choose an axes type from the sidebars to begin calibration.</p>
+    </div>
+  </div>
+  <div id="image-page-relabel-popup" class="popupwindow" style="visibility:hidden; position:absolute;">
+    <div class="popupheading">
+      <span>Relabel pages</span>
+      <input type="button" value="×" title="Close" onclick="wpd.popup.close('image-page-relabel-popup')" style="float:right;">
+    </div>
+    <div class="popupcontent">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <label for="image-page-relabel-input">New label:</label>
+        <input id="image-page-relabel-input" oninput="wpd.appData.getPageManager()?.validateLabel(this.value)">
+      </div>
+      <div style="margin-top:8px;">
+        <label><input type="checkbox" id="image-page-relabel-all-checkbox" disabled> Apply relative labels to all pages</label>
+      </div>
+      <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+        <input id="image-page-relabel-set-button" type="button" value="Set" disabled onclick="wpd.appData.getPageManager()?.setLabel()">
+        <input id="image-page-relabel-delete-button" type="button" value="Delete" disabled onclick="wpd.appData.getPageManager()?.deleteLabel(false)">
+        <input id="image-page-relabel-delete-all-button" type="button" value="Delete all" disabled onclick="wpd.appData.getPageManager()?.deleteLabel(true)">
+      </div>
+    </div>
   </div>
 
   <!-- Individual, uncompressed javascript files -->
@@ -172,54 +304,29 @@
 
   <!-- Core application script -->
   <script src="javascript/main.js"></script>
+  <!-- Initialization is handled by javascript/main.js (wpd.initApp). Add a tiny helper for samples. -->
   <script>
-    console.log("Starting app initialization...");
-    
-    // Add error handling
-    window.addEventListener('error', function(e) {
-      console.error('Script error:', e.filename, e.lineno, e.message);
-    });
-    
-    // Custom simplified initialization
-    function initSimplified() {
-      console.log("Simplified initialization...");
-      
-      // Check if required objects exist
-      if (typeof wpd === 'undefined') {
-        console.error("wpd object not found!");
-        document.getElementById('loadingCurtain').innerHTML = "Error: Core wpd object missing. Check console.";
-        return;
-      }
-      
-      // Initialize basic components that exist
+    window._wpdLoadSample = function() {
       try {
-        if (wpd.browserInfo && wpd.browserInfo.checkBrowser) {
-          wpd.browserInfo.checkBrowser();
-        }
-        
-        if (wpd.layoutManager && wpd.layoutManager.initialLayout) {
-          wpd.layoutManager.initialLayout();
-        }
-        
-        // Try to load default image
-        if (wpd.loadDefaultImage) {
+        const sel = document.getElementById('sample-select');
+        const url = sel ? sel.value : 'start.png';
+        // Use existing API to load by URL
+        if (wpd && wpd.imageManager && wpd.imageManager.loadFromURL) {
+          wpd.busyNote && wpd.busyNote.show && wpd.busyNote.show();
+          wpd.imageManager.loadFromURL(url).then(() => {
+            wpd.busyNote && wpd.busyNote.close && wpd.busyNote.close();
+          }).catch(err => {
+            wpd.busyNote && wpd.busyNote.close && wpd.busyNote.close();
+            console.error('Sample load error:', err);
+            wpd.messagePopup && wpd.messagePopup.show && wpd.messagePopup.show('Error', 'Could not load sample: ' + err.message);
+          });
+        } else if (wpd && wpd.loadDefaultImage) {
           wpd.loadDefaultImage();
         }
-        
-        // Hide loading screen
-        document.getElementById('loadingCurtain').style.display = 'none';
-        console.log("Application loaded successfully!");
-        
-      } catch (error) {
-        console.error("Initialization error:", error);
-        document.getElementById('loadingCurtain').innerHTML = "Error: " + error.message;
+      } catch (e) {
+        console.error(e);
       }
-    }
-    
-    document.addEventListener("DOMContentLoaded", function() {
-      console.log("DOM loaded, checking wpd object:", typeof wpd);
-      setTimeout(initSimplified, 100); // Small delay to ensure all scripts are loaded
-    }, true);
+    };
   </script>
 </body>
 </html>

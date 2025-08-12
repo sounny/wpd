@@ -19,6 +19,35 @@
     along with WebPlotDigitizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+:root {
+    /* Light theme defaults */
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --panel-2: #f8fafc; /* slate-50 */
+    --text: #0b1220; /* near-black */
+    --muted: #4b5563; /* slate-600 */
+    --accent: #4f46e5; /* indigo-600 */
+    --accent-2: #6366f1; /* indigo-500 */
+    --border: #e5e7eb; /* slate-200 */
+    --ok: #16a34a;
+    --warn: #ca8a04;
+    --danger: #dc2626;
+}
+
+[data-theme="dark"] {
+    --bg: #0b0b0c;
+    --panel: #141418;
+    --panel-2: #1b1b21;
+    --text: #eaeaf0;
+    --muted: #a2a2b3;
+    --accent: #4f46e5;
+    --accent-2: #6366f1;
+    --border: #2a2a33;
+    --ok: #16a34a;
+    --warn: #ca8a04;
+    --danger: #dc2626;
+}
+
 html {
     height: 100%;
     width: 100%;
@@ -31,9 +60,10 @@ body {
     padding: 0;
     width: 100%;
     height: 100%;
-    font: 14px Verdana, sans-serif;
-    line-height: 150%;
-    background: white;
+    font: 14px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    line-height: 1.5;
+    background: var(--bg);
+    color: var(--text);
     overflow: hidden;
 }
 
@@ -53,32 +83,52 @@ td {
     float: left;
 }
 
+/* Top bar */
 #topContainer {
     width: 100%;
-    height: 40px;
-    border-bottom: thin lightgrey solid;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
 }
 
 #menuButtonsContainer {
-    padding-top: 4px;
-    padding-left: 5px;
-    padding-right: 5px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    width: 100%;
 }
 
-#topToolbarContainer {
-    display: inline-block;
+#navbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 auto;
 }
+
+.brand {
+    font-weight: 700;
+    color: var(--text);
+    margin-right: 8px;
+    letter-spacing: 0.2px;
+}
+
+#topToolbarContainer { display: none; }
 
 #graphicsContainer {
     overflow: auto;
     display: inline-block;
+    background: var(--panel-2);
 }
 
 #sidebarContainer {
     float: right;
-    width: 270px;
+    width: 300px;
     height: 100%;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
 }
 
 #bottomContainer {
@@ -92,7 +142,7 @@ td {
     /* temporary */
     width: 600px;
     /* temporary */
-    background: white;
+    background: var(--panel-2);
     padding: 0;
     margin: 0;
 }
@@ -113,7 +163,7 @@ td {
 }
 
 .zoomLayers {
-    border: thin grey solid;
+    border: 1px solid var(--border);
     margin: 0;
     padding: 0;
 }
@@ -130,18 +180,44 @@ td {
     padding: 0px 0px;
     margin: 0;
     margin-top: -5px;
-    background: white;
+    background: var(--panel);
     width: 250px;
     top: 0px;
     font-size: 12px;
     text-align: center;
 }
 
-select {
-    height: 20px;
+select, input[type="file"], input[type="text"], input[type="number"], button {
+    font: inherit;
+}
+
+select, input[type="text"], input[type="number"], input[type="file"] {
+    height: 32px;
     font-size: 13px;
-    font-family: Verdana, sans-serif;
-    border: thin grey solid;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 0 8px;
+}
+
+.btn {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    cursor: pointer;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.btn-ghost {
+    background: transparent;
+    border-color: var(--border);
 }
 
 .standardToolbar {
@@ -166,32 +242,35 @@ select {
     margin: 0;
 }
 
+/* Popup windows */
 .popupheading {
     font-size: 14px;
     text-align: left;
     cursor: move;
-    background-color: gold;
-    color: black;
-    margin: 0 -5px 0 -5px;
-    padding: 5px;
+    background-color: var(--panel-2);
+    color: var(--text);
+    margin: 0;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
 }
 
-.popup {
-    padding: 0px 5px 12px 5px;
+.popupwindow, .popup {
+    padding: 0;
     margin: 0;
-    border: thin #444444 solid;
-    background: white;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
     z-index: 100;
     position: absolute;
     top: 0;
     left: 0;
     visibility: hidden;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
 }
 
-.popup p {
-    padding: 0;
-    margin: 5px 5px;
-}
+.popupcontent { padding: 12px; }
+.popupcontent p { margin: 6px 0; }
 
 .popup-drag-mask {
     position: absolute;
@@ -205,15 +284,15 @@ select {
 }
 
 .sidebar-title {
-    background: #ddd;
-    color: black;
+    background: var(--panel-2);
+    color: var(--text);
     padding: 2px;
 }
 
 .sidebar {
     padding: 0px 0px;
     margin: 0;
-    background: white;
+    background: var(--panel);
     width: 250px;
     display: none;
     font-size: 13px;
@@ -267,8 +346,8 @@ select {
     position: absolute;
     top: 0px;
     left: 300px;
-    background: #666666;
-    color: lightgreen;
+    background: var(--panel-2);
+    color: var(--text);
     width: 200px;
     margin: 0px;
     display: inline-block;
@@ -312,9 +391,17 @@ select {
 #navSeparator {
     height: 100%;
     margin: 0px 10px 0px 20px;
-    border-left: thin lightgray solid;
+    border-left: 1px solid var(--border);
 }
 
 label {
     vertical-align: top;
+}
+
+/* Loading curtain */
+#loadingCurtain {
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.98));
+    z-index:100;display:flex;justify-content:center;align-items:center;
+    font-size: 16px; color: var(--muted);
 }

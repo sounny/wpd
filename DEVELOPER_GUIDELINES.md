@@ -24,12 +24,9 @@ To install MacOS packages and download other dependencies, you can try the scrip
 
 For other operating systems, please install the following dependencies manually:
 
-UI:
-- See app/thirdparty folder and download the required third party libraries and dependencies.
-- The Eigen C++ template library (see <http://eigen.tuxfamily.org/>).
-- A recent Java to run the javascript compiler (Google Closure Compiler).
-- Python 3 with python3-jinja2 package and python3-babel to compile the HTML templates.
-- js-beautify npm package to autoformat javascript, HTML and CSS files.
+UI (this fork):
+- No build step required. Static HTML/CSS/JS served from the repository root.
+- Third-party: PDF.js is loaded from a CDN in `index.html`.
 
 Web Server:
 - A recent Go compiler
@@ -43,13 +40,7 @@ Electron App:
 
 **Building HTML5 Source**
 
-To build the HTML5 code, do the following (make sure you have checked out the dependencies above):
-
-    cd app
-    npm install
-    npm run build
-
-This should generate a combined-compiled.js file and several HTML files in the 'app' directory. Use the web server (see webserver folder) or Electron app (see electron folder) to host this app.
+This fork does not require a build step. Open `index.html` directly or serve the folder via a static HTTP server.
 
 **Web Server**
 
@@ -86,44 +77,7 @@ This will create apps for Mac, Windows and Linux.
 
 ## Unit Tests
 
-Please consider adding unit tests when adding or editing code. Any contributions to increase existing code coverage is greatly appreciated.
-
-Unit tests are located in the `app/tests` directory. The tests are written for [QUnit](https://api.qunitjs.com/). The test runner [Karma](https://karma-runner.github.io/) is used to enable command-line results. The mocking library [Sinon.js](https://sinonjs.org/) is included as well to facilitate unit test creation.
-
-**Adding tests**
-
-To add tests, locate the appropriate test file under `app/tests` (or create an appropriate file) and add the tests there.
-
-This isn't always possible, but ideally, each unit test assertion should complete execution within 10ms.
-
-**Running tests**
-
-To run the tests, use the following commands:
-
-    cd app
-    npm test
-
-This will load the QUnit tests, run them, and display the results.
-
-To view the QUnit results in the browser, start a development server and append `/tests` to the url (e.g. `http://localhost:8080/tests`).
-
-**Testing different browsers**
-
-To run the unit tests in different browsers, use this command:
-
-    npm test -- --browsers [browser-name]
-
-Note: `[browser-name]` is sentence-cased (e.g. Chrome).
-
-Or, alternatively, edit `karma.conf.js`, uncomment all desired browsers to concurrently run tests on under `browsers`, and re-run the tests.
-
-Karma can run the tests on a plethora of browsers. To use another browser, visit https://karma-runner.github.io/latest/config/browsers.html for more information on how to set it up. This typically involves having the desired browser installed on your local machine, and a Karma plugin for the browser. By default, Karma plugins for Chrome, Firefox, and Edge are already installed.
-
-**Auto-watch**
-
-Karma has been configured to run in single-run mode. But Karma has the ability to watch files for changes and re-run tests. To enable this behavior, run the following instead of `npm test`:
-
-    npm test -- --single-run false
+This fork currently does not include the legacy QUnit/Karma test runner. If you add tests, prefer lightweight browser-based test harnesses or simple integration checks.
 
 ## Coding Style
 
@@ -142,11 +96,11 @@ Custom JS scripts can be loaded into WebPlotDigitizer and executed. See [script_
 
 ## Docker
 
-To build a docker image see the file `research/Dockerfile`.
+Legacy Docker and research artifacts have been pruned in this fork.
 
 ## Internationalization (Language Translations)
 
-Use [Poedit](https://poedit.net/) to edit the `.po` files in `app/locale` folder. To add support for a new language, please contact Ankit Rohatgi.
+Translations in this fork are provided inline (minimal i18n strings) in `index.html`.
 
 ## Documentation, Tutorial Videos
 

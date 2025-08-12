@@ -110,7 +110,8 @@ wpd.imageManager = (function() {
         if (_firstLoad) {
             wpd.sidebar.show('start-sidebar');
         } else if (!resumedProject) {
-            wpd.popup.show('axesList');
+            // Show guidance in sidebar instead of a blocking popup
+            try { wpd.sidebar.show('help-sidebar'); } catch (e) {}
         }
         _firstLoad = false;
         _newLoad = false;
