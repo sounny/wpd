@@ -52,10 +52,21 @@ wpd.graphicsWidget = (function() {
         rotation = 0;
 
     function posn(ev) { // get screen pixel from event
+        let pageX, pageY;
+        if (ev.touches && ev.touches.length > 0) {
+            pageX = ev.touches[0].pageX;
+            pageY = ev.touches[0].pageY;
+        } else if (ev.changedTouches && ev.changedTouches.length > 0) {
+            pageX = ev.changedTouches[0].pageX;
+            pageY = ev.changedTouches[0].pageY;
+        } else {
+            pageX = ev.pageX;
+            pageY = ev.pageY;
+        }
         let mainCanvasPosition = $mainCanvas.getBoundingClientRect();
         return {
-            x: parseInt(ev.pageX - (mainCanvasPosition.left + window.pageXOffset), 10),
-            y: parseInt(ev.pageY - (mainCanvasPosition.top + window.pageYOffset), 10)
+            x: parseInt(pageX - (mainCanvasPosition.left + window.pageXOffset), 10),
+            y: parseInt(pageY - (mainCanvasPosition.top + window.pageYOffset), 10)
         };
     }
 
@@ -595,9 +606,34 @@ wpd.graphicsWidget = (function() {
         $topCanvas.addEventListener("mouseup", onMouseUp, false);
         $topCanvas.addEventListener("mousedown", onMouseDown, false);
         $topCanvas.addEventListener("mouseout", onMouseOut, true);
+        $topCanvas.addEventListener("touchstart", function(ev) {
+            ev.preventDefault();
+            onMouseDown(ev);
+        }, false);
+        $topCanvas.addEventListener("touchmove", function(ev) {
+            ev.preventDefault();
+            onMouseMove(ev);
+        }, false);
+        $topCanvas.addEventListener("touchend", function(ev) {
+            ev.preventDefault();
+            onMouseUp(ev);
+        }, false);
+        $topCanvas.addEventListener("touchcancel", function(ev) {
+            ev.preventDefault();
+            onMouseUp(ev);
+        }, false);
         document.addEventListener("mouseup", onDocumentMouseUp, false);
+        document.addEventListener("touchend", onDocumentMouseUp, false);
+        document.addEventListener("touchcancel", onDocumentMouseUp, false);
 
         document.addEventListener("mousedown", function(ev) {
+            if (ev.target === $topCanvas) {
+                isCanvasInFocus = true;
+            } else {
+                isCanvasInFocus = false;
+            }
+        }, false);
+        document.addEventListener("touchstart", function(ev) {
             if (ev.target === $topCanvas) {
                 isCanvasInFocus = true;
             } else {
